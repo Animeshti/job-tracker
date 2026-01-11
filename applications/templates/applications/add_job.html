@@ -1,0 +1,11 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<h2>Add Job Application</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-success">Save</button>
+</form>
+{% endblock %}

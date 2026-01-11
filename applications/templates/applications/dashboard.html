@@ -1,0 +1,44 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row text-center">
+
+  <div class="col-md-3">
+    <div class="card p-3 shadow">
+      <h5>Total</h5>
+      <h2>{{ total }}</h2>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card p-3 shadow">
+      <h5>Interviews</h5>
+      <h2>{{ interviews }}</h2>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card p-3 shadow">
+      <h5>Offers</h5>
+      <h2>{{ offers }}</h2>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card p-3 shadow">
+      <h5>Rejected</h5>
+      <h2>{{ rejected }}</h2>
+    </div>
+  </div> 
+
+  <div class="mt-4">
+    <a href="{% url 'send_reminders' %}" class="btn btn-info">
+        Send Reminder Emails
+    </a>
+</div>
+
+
+</div>
+{% endblock %}

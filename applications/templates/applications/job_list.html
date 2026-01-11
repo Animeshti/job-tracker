@@ -1,0 +1,38 @@
+{% extends 'applications/base.html' %}
+
+{% block content %}
+<h2>My Job Applications</h2>
+
+<a class="btn btn-primary mb-3" href="{% url 'add_job' %}">Add New Job</a>
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Company</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Applied Date</th> 
+        <th>Actions</th>
+    </tr>
+
+    {% for job in jobs %}
+    <tr>
+        <td>{{ job.company_name }}</td>
+        <td>{{ job.job_title }}</td>
+        <td>{{ job.status }}</td>
+        <td>{{ job.applied_date }}</td>
+        <td>
+            <a class="btn btn-sm btn-warning" href="{% url 'edit_job' job.id %}">Edit</a>
+            <a class="btn btn-sm btn-danger"
+               href="{% url 'delete_job' job.id %}"
+               onclick="return confirm('Delete this job?');">
+               Delete
+            </a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No job applications yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
