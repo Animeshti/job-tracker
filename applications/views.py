@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from .forms import JobApplicationForm, RegisterForm
 from django.contrib.auth.decorators import login_required
-from .models import JobApplication 
-from django.core.mail import send_mail 
-from django.conf import settings  
-from datetime import date, timedelta  
-from .forms import RegisterForm
-from django.contrib import messages 
+from .models import JobApplication
+from django.core.mail import send_mail
+from django.conf import settings
+from datetime import date, timedelta
+from django.contrib import messages
 
 
 def home(request):
@@ -22,17 +21,18 @@ def add_job(request):
             job.user = request.user
             job.save()
 
-            print("DEBUG: job saved, now sending email")   # 👈 DEBUG
-
-            send_mail(
-                subject='Job Added Successfully',
-                message=f'You added a new job application for {job.company_name} - {job.job_title}.',
-                from_email='test@example.com',
-                recipient_list=[request.user.email],
-                fail_silently=False,
-            )
-
-            print("DEBUG: email function executed")        # 👈 DEBUG
+            # ✅ SAFE EMAIL (won’t crash production)
+            try:
+                send_mail(
+                    subject='Job Added Successfully',
+                    message=f'You added a new job application for {job.company_name} - {job.job_title}.',
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[request.user.email],
+                    fail_silently=True,
+                )
+            except Exception as e:
+                # optional: log error later
+                pass
 
             return redirect('job_list')
     else:
@@ -59,7 +59,6 @@ def edit_job(request, job_id):
     else:
         form = JobApplicationForm(instance=job)
 
-    # return must be INSIDE the function
     return render(request, 'applications/edit_job.html', {'form': form})
 
 
@@ -67,7 +66,8 @@ def edit_job(request, job_id):
 def delete_job(request, job_id):
     job = JobApplication.objects.get(id=job_id, user=request.user)
     job.delete()
-    return redirect('job_list') 
+    return redirect('job_list')
+
 
 @login_required
 def dashboard(request):
@@ -85,6 +85,7 @@ def dashboard(request):
 
     return render(request, 'applications/dashboard.html', context)
 
+
 @login_required
 def send_reminders(request):
     seven_days_ago = date.today() - timedelta(days=7)
@@ -96,15 +97,19 @@ def send_reminders(request):
     )
 
     for job in jobs:
-        send_mail(
-            subject='Job Follow-up Reminder',
-            message=f'Remember to follow up on your application at {job.company_name} for {job.job_title}.',
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[request.user.email],
-            fail_silently=True,
-        )
+        try:
+            send_mail(
+                subject='Job Follow-up Reminder',
+                message=f'Remember to follow up on your application at {job.company_name} for {job.job_title}.',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[request.user.email],
+                fail_silently=True,
+            )
+        except:
+            pass
 
-    return redirect('dashboard') 
+    return redirect('dashboard')
+
 
 def register(request):
     if request.method == 'POST':
