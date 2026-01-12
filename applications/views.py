@@ -21,24 +21,12 @@ def add_job(request):
             job.user = request.user
             job.save()
 
-            # ✅ SAFE EMAIL (won’t crash production)
-            try:
-                send_mail(
-                    subject='Job Added Successfully',
-                    message=f'You added a new job application for {job.company_name} - {job.job_title}.',
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[request.user.email],
-                    fail_silently=True,
-                )
-            except Exception as e:
-                # optional: log error later
-                pass
-
             return redirect('job_list')
     else:
         form = JobApplicationForm()
 
     return render(request, 'applications/add_job.html', {'form': form})
+
 
 
 @login_required
